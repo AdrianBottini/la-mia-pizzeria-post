@@ -1,7 +1,11 @@
+using la_mia_pizzeria_static.Models;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddSqlServer<PizzeriaContext>("Data Source=localhost;Initial Catalog=pizzeriaDb;Integrated Security=True; TrustServerCertificate=True");
 
 var app = builder.Build();
 
@@ -22,6 +26,11 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Pizza}/{action=Index}/{id?}");
+using (var scope = app.Services.CreateScope())
+using (var ctx = scope.ServiceProvider.GetService<PizzeriaContext>())
+{
+    ctx!.Seed();
+}
 
 app.Run();
